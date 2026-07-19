@@ -54,17 +54,25 @@
       ];
       forAllSystems = lib.genAttrs supportedSystems;
 
-      mkHomeManagerModule = user: {
+      identity = {
+        username = "oliver";
+        fullName = "Oliver Wooding";
+        email = "oliver@wooding.dev";
+        linuxUid = 1000;
+        darwinUid = 501;
+      };
+
+      mkHomeManagerModule = identity: {
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.backupFileExtension = "backup";
-        home-manager.extraSpecialArgs = { inherit user; };
-        home-manager.users.${user} = import ./home;
+        home-manager.extraSpecialArgs = { inherit identity; };
+        home-manager.users.${identity.username} = import ./home;
       };
 
       mkNixosHost =
         {
-          user,
+          identity,
           name,
           system,
           extraModules ? [ ],
@@ -72,7 +80,8 @@
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
-            inherit inputs user;
+            inherit identity inputs;
+            user = identity.username;
           };
 
           modules = [
@@ -83,14 +92,14 @@
             inputs.agenix.nixosModules.default
             inputs.quadlet-nix.nixosModules.quadlet
             home-manager.nixosModules.home-manager
-            (mkHomeManagerModule user)
+            (mkHomeManagerModule identity)
           ]
           ++ extraModules;
         };
 
       mkDarwinHost =
         {
-          user,
+          identity,
           name,
           system,
           extraModules ? [ ],
@@ -98,7 +107,8 @@
         darwin.lib.darwinSystem {
           inherit system;
           specialArgs = {
-            inherit self user inputs;
+            inherit self identity inputs;
+            user = identity.username;
           };
 
           modules = [
@@ -108,7 +118,7 @@
             ./modules/languages
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
-            (mkHomeManagerModule user)
+            (mkHomeManagerModule identity)
           ]
           ++ extraModules;
         };
@@ -131,13 +141,13 @@
 
       nixosConfigurations = {
         rigi = mkNixosHost {
-          user = "oliver";
+          inherit identity;
           name = "rigi";
           system = "x86_64-linux";
         };
 
         wildspitz = mkNixosHost {
-          user = "oliver";
+          inherit identity;
           name = "wildspitz";
           system = "x86_64-linux";
         };
@@ -145,7 +155,7 @@
 
       darwinConfigurations = {
         pilatus = mkDarwinHost {
-          user = "oliver";
+          inherit identity;
           name = "pilatus";
           system = "aarch64-darwin";
         };

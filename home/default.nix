@@ -1,4 +1,4 @@
-{ user, ... }:
+{ identity, ... }:
 {
   imports = [
     ./anki.nix
@@ -22,7 +22,7 @@
     ./zoxide.nix
   ];
 
-  home.username = user;
+  home.username = identity.username;
   # Compatibility version from the first Home Manager installation. Do not
   # update this when updating Home Manager; review migrations individually.
   home.stateVersion = "24.11";

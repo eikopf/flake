@@ -1,4 +1,4 @@
-{ ... }:
+{ identity, ... }:
 {
   programs.jujutsu = {
     enable = true;
@@ -6,8 +6,8 @@
       ui.editor = "nvim";
 
       user = {
-        name = "oliver";
-        email = "oliver@wooding.dev";
+        name = identity.fullName;
+        email = identity.email;
       };
     };
   };

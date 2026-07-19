@@ -2,6 +2,7 @@
 
 {
   self,
+  identity,
   user,
   pkgs,
   ...
@@ -11,7 +12,7 @@
 
   # this is apparently the default uid for the primary user on macOS, but you
   # can get the exact value by running `dscl . -read /Users/<user> UniqueID`
-  users.users.${user}.uid = 501;
+  users.users.${user}.uid = identity.darwinUid;
 
   security.pam.services.sudo_local.touchIdAuth = true;
 

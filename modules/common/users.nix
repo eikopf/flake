@@ -1,22 +1,24 @@
 # user configuration for both NixOS and macOS hosts
 
 {
-  user,
+  identity,
   pkgs,
   lib,
   ...
 }:
 let
+  user = identity.username;
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
 in
 {
   users.users.${user} = {
-    description = "Oliver Wooding";
+    description = identity.fullName;
     home = if isDarwin then "/Users/${user}" else "/home/${user}";
     shell = pkgs.fish;
   }
   // lib.optionalAttrs isLinux {
+    uid = identity.linuxUid;
     extraGroups = [
       "wheel"
       "networkmanager"

@@ -1,11 +1,11 @@
-{ ... }:
+{ identity, ... }:
 {
   programs.git = {
     enable = true;
     settings = {
       user = {
-        name = "oliver";
-        email = "oliver@wooding.dev";
+        name = identity.fullName;
+        email = identity.email;
       };
 
       init.defaultBranch = "main";

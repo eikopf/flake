@@ -79,6 +79,9 @@
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) containers networks;
+      userHome = config.users.users.${user}.home;
+      userUid = toString config.users.users.${user}.uid;
+      usersGid = toString config.users.groups.users.gid;
       secretFile =
         if config.age.secrets ? grimmory-env then
           config.age.secrets.grimmory-env.path
@@ -106,16 +109,16 @@
         containerConfig = {
           image = "ghcr.io/grimmory-tools/grimmory:v3.2.4";
           environments = commonEnvironment // {
-            USER_ID = "1000"; # oliver
-            GROUP_ID = "100"; # users
+            USER_ID = userUid;
+            GROUP_ID = usersGid;
             DATABASE_URL = "jdbc:mariadb://grimmory-mariadb:3306/grimmory";
             DATABASE_USERNAME = "grimmory";
           };
           environmentFiles = [ secretFile ]; # DATABASE_PASSWORD
           volumes = [
             "/var/lib/grimmory/data:/app/data" # app state, cache, logs
-            "/home/oliver/documents/library:/books" # one subdir per Grimmory library (calibre, ...), indexed in place
-            "/home/oliver/documents/library-ingest:/bookdrop" # drop books here to auto-import
+            "${userHome}/documents/library:/books" # one subdir per Grimmory library (calibre, ...), indexed in place
+            "${userHome}/documents/library-ingest:/bookdrop" # drop books here to auto-import
           ];
           publishPorts = [ "6060:6060" ];
           networks = [ networks.grimmory.ref ];
@@ -132,12 +135,12 @@
       containers.shelfmark.containerConfig = {
         image = "ghcr.io/calibrain/shelfmark:v1.3.2";
         environments = commonEnvironment // {
-          PUID = "1000"; # oliver
-          PGID = "100"; # users
+          PUID = userUid;
+          PGID = usersGid;
         };
         volumes = [
           "/var/lib/shelfmark:/config" # settings + request database
-          "/home/oliver/documents/library-ingest:/books" # = Grimmory's /bookdrop
+          "${userHome}/documents/library-ingest:/books" # = Grimmory's /bookdrop
         ];
         publishPorts = [ "127.0.0.1:8084:8084" ];
       };
@@ -147,8 +150,8 @@
         # PUID/PGID handling, keeping the data dir owned by oliver:users.
         image = "lscr.io/linuxserver/mariadb:11.4.5";
         environments = commonEnvironment // {
-          PUID = "1000"; # oliver
-          PGID = "100"; # users
+          PUID = userUid;
+          PGID = usersGid;
           MYSQL_DATABASE = "grimmory";
           MYSQL_USER = "grimmory";
         };
@@ -163,10 +166,10 @@
   # must exist before podman can bind-mount them.
   systemd.tmpfiles.rules = [
     "d /var/lib/grimmory 0750 root users -" # holds the legacy secrets.env until agenix is bootstrapped
-    "d /var/lib/grimmory/data 0750 oliver users -"
-    "d /var/lib/grimmory/mariadb 0750 oliver users -"
-    "d /var/lib/shelfmark 0750 oliver users -"
-    "d /home/oliver/documents/library-ingest 0755 oliver users -"
+    "d /var/lib/grimmory/data 0750 ${user} users -"
+    "d /var/lib/grimmory/mariadb 0750 ${user} users -"
+    "d /var/lib/shelfmark 0750 ${user} users -"
+    "d ${config.users.users.${user}.home}/documents/library-ingest 0755 ${user} users -"
   ];
 
   # Serve Grimmory as a Tailscale Service: it gets its own DNS name
