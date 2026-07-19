@@ -45,7 +45,6 @@
     docker
     orbstack
 
-    gh # github CLI integration
     mosh # roaming-friendly remote shell (server end of mosh sessions)
     tmux # terminal multiplexer
     pnpm # javascript package manager

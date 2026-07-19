@@ -13,11 +13,9 @@
     gnupg
     readline
     rlwrap
-    tree
     vim
     wget
     curl
-    fish
     hyperfine
     just
   ];
