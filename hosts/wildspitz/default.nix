@@ -94,6 +94,8 @@
       # resolution can't misfire under systemd; bump deliberately.
       containers.grimmory = {
         unitConfig = {
+          # MariaDB uses Notify=healthy below, so this orders Grimmory after
+          # the database is accepting connections, not merely after it starts.
           Requires = [ containers.grimmory-mariadb.ref ];
           After = [ containers.grimmory-mariadb.ref ];
         };
@@ -146,6 +148,12 @@
           MYSQL_DATABASE = "grimmory";
           MYSQL_USER = "grimmory";
         };
+        healthCmd = "mariadb-admin ping --host=127.0.0.1 --silent";
+        healthInterval = "5s";
+        healthRetries = 20;
+        healthStartPeriod = "60s";
+        healthTimeout = "3s";
+        notify = "healthy";
         environmentFiles = [ secretFile ]; # MYSQL_{ROOT_,}PASSWORD
         volumes = [ "/var/lib/grimmory/mariadb:/config" ];
         # No published ports: only reachable over the grimmory podman network.
