@@ -6,8 +6,6 @@
   fileSystems."/boot".options = [ "umask=0077" ];
 
   networking.networkmanager.enable = true;
-  networking.firewall.enable = true;
-
   # local caching DNS resolver with DNSSEC and mDNS support
   services.resolved.enable = true;
 
