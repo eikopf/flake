@@ -17,7 +17,7 @@ check:
 
 # Format all Nix files
 fmt:
-    nix fmt .
+    nix fmt
 
 # Update all flake inputs
 update:
