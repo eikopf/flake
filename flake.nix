@@ -124,7 +124,7 @@
         };
     in
     {
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
 
       # checks exist so `nix flake check` evaluates every host config; cross-host
       # regressions surface immediately even though only the current system's
