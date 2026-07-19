@@ -23,8 +23,6 @@
   ];
 
   home.username = identity.username;
-  # Compatibility version from the first Home Manager installation. Do not
-  # update this when updating Home Manager; review migrations individually.
-  home.stateVersion = "24.11";
+  home.stateVersion = "26.05";
   programs.home-manager.enable = true;
 }

@@ -2,9 +2,6 @@
 {
   programs.firefox = {
     enable = lib.mkDefault false;
-    # This profile has already been migrated to Home Manager's XDG location.
-    configPath = "${config.xdg.configHome}/mozilla/firefox";
-
     # see https://firefox-admin-docs.mozilla.org/reference/policies/ for details
     policies = {
       # disable telemetry and annoying features
