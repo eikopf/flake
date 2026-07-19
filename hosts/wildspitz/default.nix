@@ -98,7 +98,7 @@
           After = [ containers.grimmory-mariadb.ref ];
         };
         containerConfig = {
-          image = "ghcr.io/grimmory-tools/grimmory:v3.2.4";
+          image = "ghcr.io/grimmory-tools/grimmory:v3.2.4@sha256:dfa7afdfcf25d649fd664497a62385dd00cd9678c37546e182c172e41c8e80cb";
           environments = commonEnvironment // {
             USER_ID = userUid;
             GROUP_ID = usersGid;
@@ -124,7 +124,7 @@
       # configuration (sources, users) lives in /config via the web UI.
       # Localhost-only: no LAN clients, tailnet access via tailscale serve.
       containers.shelfmark.containerConfig = {
-        image = "ghcr.io/calibrain/shelfmark:v1.3.2";
+        image = "ghcr.io/calibrain/shelfmark:v1.3.2@sha256:8700c1d3b6bb94e1b5f9482bac12e39652ed737de02f256920e1ad982a7ac0f1";
         environments = commonEnvironment // {
           PUID = userUid;
           PGID = usersGid;
@@ -139,7 +139,7 @@
       containers.grimmory-mariadb.containerConfig = {
         # The linuxserver image (as in Grimmory's reference compose) for its
         # PUID/PGID handling, keeping the data dir owned by oliver:users.
-        image = "lscr.io/linuxserver/mariadb:11.4.5";
+        image = "lscr.io/linuxserver/mariadb:11.4.5@sha256:eef506eab5c5e5aaa3ce6d1237dcfa5742a8dafd9054e668c838fad71b0d1547";
         environments = commonEnvironment // {
           PUID = userUid;
           PGID = usersGid;
