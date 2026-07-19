@@ -54,6 +54,22 @@
       ];
       forAllSystems = lib.genAttrs supportedSystems;
 
+      mkRepositoryChecks =
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          deadnix = pkgs.runCommand "deadnix-check" { nativeBuildInputs = [ pkgs.deadnix ]; } ''
+            deadnix --fail ${self}
+            touch $out
+          '';
+          formatting = pkgs.runCommand "formatting-check" { nativeBuildInputs = [ pkgs.nixfmt-tree ]; } ''
+            treefmt --ci ${self}
+            touch $out
+          '';
+        };
+
       identity = {
         username = "oliver";
         fullName = "Oliver Wooding";
@@ -130,11 +146,11 @@
       # regressions surface immediately even though only the current system's
       # checks get built locally.
       checks = {
-        x86_64-linux = {
+        x86_64-linux = mkRepositoryChecks "x86_64-linux" // {
           rigi = self.nixosConfigurations.rigi.config.system.build.toplevel;
           wildspitz = self.nixosConfigurations.wildspitz.config.system.build.toplevel;
         };
-        aarch64-darwin = {
+        aarch64-darwin = mkRepositoryChecks "aarch64-darwin" // {
           pilatus = self.darwinConfigurations.pilatus.system;
         };
       };

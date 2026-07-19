@@ -4,7 +4,6 @@
   self,
   identity,
   user,
-  pkgs,
   ...
 }:
 {
