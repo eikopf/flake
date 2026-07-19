@@ -2,9 +2,8 @@
 {
   programs.firefox = {
     enable = lib.mkDefault false;
-    # Preserve the profile location used before Home Manager 26.05. Moving it
-    # requires an explicit data migration, not merely a package update.
-    configPath = ".mozilla/firefox";
+    # This profile has already been migrated to Home Manager's XDG location.
+    configPath = "${config.xdg.configHome}/mozilla/firefox";
 
     # see https://firefox-admin-docs.mozilla.org/reference/policies/ for details
     policies = {
