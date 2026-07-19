@@ -67,14 +67,9 @@
   # runs userspace-networking without proxy flags, which only handles inbound
   # connections.
   #
-  # Until the encrypted file has been bootstrapped, keep using the existing
-  # root-owned environment file so this migration cannot rotate the live DB
-  # password. Once present, agenix decrypts it into /run at activation time.
-  age.secrets = lib.optionalAttrs (builtins.pathExists ../../secrets/grimmory.env.age) {
-    grimmory-env = {
-      file = ../../secrets/grimmory.env.age;
-      mode = "0400";
-    };
+  age.secrets.grimmory-env = {
+    file = ../../secrets/grimmory.env.age;
+    mode = "0400";
   };
   virtualisation.quadlet =
     let
@@ -82,11 +77,7 @@
       userHome = config.users.users.${user}.home;
       userUid = toString config.users.users.${user}.uid;
       usersGid = toString config.users.groups.users.gid;
-      secretFile =
-        if config.age.secrets ? grimmory-env then
-          config.age.secrets.grimmory-env.path
-        else
-          "/var/lib/grimmory/secrets.env";
+      secretFile = config.age.secrets.grimmory-env.path;
       commonEnvironment = {
         TZ = config.time.timeZone;
       };
@@ -165,7 +156,7 @@
   # The containers chown these to the configured UID:GID at startup, but they
   # must exist before podman can bind-mount them.
   systemd.tmpfiles.rules = [
-    "d /var/lib/grimmory 0750 root users -" # holds the legacy secrets.env until agenix is bootstrapped
+    "d /var/lib/grimmory 0750 root users -"
     "d /var/lib/grimmory/data 0750 ${user} users -"
     "d /var/lib/grimmory/mariadb 0750 ${user} users -"
     "d /var/lib/shelfmark 0750 ${user} users -"
