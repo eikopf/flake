@@ -24,6 +24,9 @@
     };
   };
 
+  # age-plugin-yubikey uses the YubiKey's PIV applet through PC/SC.
+  services.pcscd.enable = true;
+
   # systemd
   systemd.network.wait-online.enable = false;
 
@@ -298,6 +301,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    age-plugin-yubikey
     inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
     # Needed on PATH by sway keybindings
     swaylock
