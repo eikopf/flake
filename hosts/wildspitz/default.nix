@@ -24,6 +24,17 @@
     };
   };
 
+  # Require PIN verification when the YubiKey is used for interactive desktop
+  # access. Other PAM consumers (such as sudo) continue to require only touch.
+  security.pam.services.greetd.rules.auth.u2f.settings = {
+    pinverification = 1;
+    userverification = 0;
+  };
+  security.pam.services.swaylock.rules.auth.u2f.settings = {
+    pinverification = 1;
+    userverification = 0;
+  };
+
   # age-plugin-yubikey uses the YubiKey's PIV applet through PC/SC.
   services.pcscd.enable = true;
 
