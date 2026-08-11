@@ -11,6 +11,19 @@
     ./thunderbird.nix
   ];
 
+  # Allow the registered FIDO/U2F token to satisfy PAM authentication on its
+  # own. Password authentication remains available as the fallback.
+  security.pam.u2f = {
+    enable = true;
+    control = "sufficient";
+    settings = {
+      cue = true;
+      authfile = pkgs.writeText "u2f-mappings" ''
+        ${user}:i8+j14o7fU2/ykOH4PCztfSxTHbbHtQNwsXzmHeyT5fvLW3Eek6/rlJqm8Lzc2/XQ/O50uYmiDAUcfNp93FAIg==,C/ArTu2/V6JUPoMUQYMbQrJSVK4uoL44jCMwGT7pK8CF9u3vtM9mXiR35yzKgH6tC+yOwoi9ZuZeF+YHn6hhuQ==,es256,+presence
+      '';
+    };
+  };
+
   # systemd
   systemd.network.wait-online.enable = false;
 
