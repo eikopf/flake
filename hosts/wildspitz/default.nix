@@ -152,7 +152,7 @@
       # configuration (sources, users) lives in /config via the web UI.
       # Localhost-only: no LAN clients, tailnet access via tailscale serve.
       containers.shelfmark.containerConfig = {
-        image = "ghcr.io/calibrain/shelfmark:v1.3.2@sha256:8700c1d3b6bb94e1b5f9482bac12e39652ed737de02f256920e1ad982a7ac0f1";
+        image = "ghcr.io/calibrain/shelfmark:v1.3.13@sha256:ee0f3a15a8cc37a43a39fb9e768eac0c9a4ac328014b9b914bad7c1be232bd90";
         environments = commonEnvironment // {
           PUID = userUid;
           PGID = usersGid;
