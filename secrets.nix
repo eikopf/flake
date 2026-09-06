@@ -15,28 +15,29 @@ let
     bitwarden
     agenix-backup
   ];
-  wildspitz = [
-    wildspitz-oliver
-    wildspitz-host
-  ]
-  ++ backups;
-  pilatus = [
-    pilatus-oliver
-    pilatus-host
-  ]
-  ++ backups;
-  # Union of the host keysets, including each backup key only once.
-  all = wildspitz ++ builtins.filter (key: !(builtins.elem key wildspitz)) pilatus;
+  hostKeys = {
+    wildspitz = [
+      wildspitz-oliver
+      wildspitz-host
+    ];
+    pilatus = [
+      pilatus-oliver
+      pilatus-host
+    ];
+  };
+  keysets = builtins.mapAttrs (_: keys: keys ++ backups) hostKeys // {
+    all = builtins.concatLists (builtins.attrValues hostKeys) ++ backups;
+  };
 in
 {
   "secrets/grimmory.env.age" = {
-    publicKeys = all;
+    publicKeys = keysets.all;
     armor = true;
   };
 }
 // builtins.listToAttrs (
   map (name: {
     name = "secrets/fonts/${name}";
-    value.publicKeys = all;
+    value.publicKeys = keysets.all;
   }) (builtins.attrNames (builtins.readDir ./secrets/fonts))
 )
