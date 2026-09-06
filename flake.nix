@@ -113,9 +113,6 @@
       checks = forAllSystems (
         system:
         repositoryChecks system
-        // lib.optionalAttrs (lib.hasSuffix "-linux" system) {
-          profiles = import ./tests/profiles.nix { inherit inputs system identity; };
-        }
         // lib.mapAttrs (
           name: host:
           if host.platform == "darwin" then

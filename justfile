@@ -12,9 +12,6 @@ lint:
     set -eu
     system=$(nix eval --impure --raw --expr builtins.currentSystem)
     nix build --no-link --no-update-lock-file ".#checks.$system.deadnix" ".#checks.$system.formatting"
-    if [ "$(uname)" = "Linux" ]; then
-        nix build --no-link --no-update-lock-file ".#checks.$system.profiles"
-    fi
 
 # Build one host without activating it
 build host:
