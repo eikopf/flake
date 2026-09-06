@@ -1,8 +1,6 @@
 # eikopf/flake
 
-Personal NixOS and macOS configurations using Home Manager, nix-darwin, and
-nix-homebrew. The flake manages desktop environments, everyday tools, and homelab
-services across these machines:
+Personal NixOS and macOS configurations. This flake manages the following machines:
 
 | Host | OS | Architecture | Roles |
 |---|---|---|---|
@@ -11,9 +9,10 @@ services across these machines:
 
 ## Structure
 
-Hosts select reusable profiles and supply device-specific settings. Profiles
-combine capabilities into roles, so one host can be both a workstation and a
-homelab machine.
+Each host uses the base configuration for its OS (`modules/darwin` or `modules/nixos`),
+selects zero or more role-specific profiles (under `profiles/`), and provides some
+one-off configurations (under `hosts/<hostname>`). Profiles represent the "purpose"
+of a host, so e.g. a NixOS workstation would use `profiles/nixos/workstation`.
 
 - `flake.nix`: inputs, personal identity, and host inventory.
 - `lib/`: configuration constructors, checks, and development shell.
@@ -23,14 +22,6 @@ homelab machine.
 - `home/`: Home Manager programs, profiles, and desktop configuration.
 - `secrets/` and `secrets.nix`: agenix-encrypted secrets and their recipient policy.
 - `wallpaper/`: desktop assets.
-- [AGENTS.md](AGENTS.md): development and maintenance instructions.
-
-The library service module runs Grimmory, MariaDB, and Shelfmark. Its host selects
-storage paths, ownership, credentials, and LAN or Tailscale publication.
-
-The Darwin personal profile uses Lix. Neovim configuration is managed separately
-in `~/.config/nvim`. Project development environments provide compilers, SDKs, and
-language tooling independently of the host configuration.
 
 ## Secrets and fonts
 
