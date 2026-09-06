@@ -7,7 +7,6 @@ services across these machines:
 | Host | System | Roles |
 |---|---|---|
 | Pilatus | Apple Silicon macOS | Personal workstation with AeroSpace |
-| Rigi | x86_64 NixOS | Workstation with Plasma (retired) |
 | Wildspitz | x86_64 NixOS | Workstation with Sway, homelab, Tailscale exit node |
 
 ## Structure

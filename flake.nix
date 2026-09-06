@@ -46,10 +46,6 @@
         email = "oliver@wooding.dev";
       };
       hosts = {
-        rigi = {
-          system = "x86_64-linux";
-          platform = "nixos";
-        };
         wildspitz = {
           system = "x86_64-linux";
           platform = "nixos";
