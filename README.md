@@ -65,6 +65,7 @@ uses agenix to decrypt it at login into the user font directory on Linux and mac
 plaintext fonts stay outside the Nix store. Decryption requires a user SSH private
 key listed in `secrets.nix` (agenix checks `~/.ssh/id_ed25519` and `~/.ssh/id_rsa`).
 
-Add a machine's user public key to `fontRecipients`, then run `nix develop` and
-`agenix -r` from the repository root to re-encrypt the secrets. Host keys can be
-recipients too, but user font installation requires a key readable by that user.
+Each host has a keyset containing its user and host keys plus the backup keys.
+Secrets use the combined `all` keyset by default. After adding keys in `secrets.nix`,
+run `nix develop` and `agenix -r` from the repository root to re-encrypt the secrets.
+User font installation requires a private key readable by that user.

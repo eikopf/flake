@@ -11,16 +11,22 @@ let
   agenix-backup = "age1yubikey1qvfh80mq75u0n08svltff2wu5rjya46gnzmrpf573en46wlm2ms3v0d7mf3";
 
   # keysets
-  all = [
-    wildspitz-oliver
-    wildspitz-host
+  backups = [
     bitwarden
     agenix-backup
   ];
-  fontRecipients = all ++ [
+  wildspitz = [
+    wildspitz-oliver
+    wildspitz-host
+  ]
+  ++ backups;
+  pilatus = [
     pilatus-oliver
     pilatus-host
-  ];
+  ]
+  ++ backups;
+  # Union of the host keysets, including each backup key only once.
+  all = wildspitz ++ builtins.filter (key: !(builtins.elem key wildspitz)) pilatus;
 in
 {
   "secrets/grimmory.env.age" = {
@@ -31,6 +37,6 @@ in
 // builtins.listToAttrs (
   map (name: {
     name = "secrets/fonts/${name}";
-    value.publicKeys = fontRecipients;
+    value.publicKeys = all;
   }) (builtins.attrNames (builtins.readDir ./secrets/fonts))
 )
