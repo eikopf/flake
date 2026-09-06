@@ -1,5 +1,3 @@
-# eikopf/flake
-
 Personal NixOS and macOS configurations. This flake manages the following machines:
 
 | Host | OS | Architecture | Roles |
