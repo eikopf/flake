@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ../fonts/berkeley-mono.nix
     ../programs/ghostty.nix
     ../programs/anki.nix
     ../programs/firefox.nix

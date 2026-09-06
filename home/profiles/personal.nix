@@ -20,12 +20,8 @@
   home.packages = with pkgs; [
     git-extras
     gh
-    fzf
-    jq
-    ripgrep
     tlrc
     just
-    tmux
     mosh
   ];
 }

@@ -7,7 +7,7 @@ services across these machines:
 | Host | System | Roles |
 |---|---|---|
 | Pilatus | Apple Silicon macOS | Personal workstation with AeroSpace |
-| Rigi | x86_64 NixOS | Workstation with Plasma |
+| Rigi | x86_64 NixOS | Workstation with Plasma (retired) |
 | Wildspitz | x86_64 NixOS | Workstation with Sway, homelab, Tailscale exit node |
 
 ## Structure
@@ -16,7 +16,8 @@ Hosts select reusable profiles and supply device-specific settings. Profiles
 combine capabilities into roles, so one host can be both a workstation and a
 homelab machine.
 
-- `flake.nix`: inputs, personal identity, host inventory, checks, and development shell.
+- `flake.nix`: inputs, personal identity, and host inventory.
+- `lib/`: configuration constructors, checks, and development shell.
 - `hosts/`: hardware, hostnames, profile selection, and service deployment settings.
 - `profiles/`: shared personal, workstation, and homelab configurations.
 - `modules/`: system capabilities, grouped into common, NixOS, and Darwin modules.
@@ -44,7 +45,7 @@ Run commands from the checkout. `nix develop` provides the maintenance tools;
 
 Activation requires NixOS or an existing nix-darwin installation. The Darwin
 personal profile uses Lix. Neovim configuration is managed separately in
-`~/.config/nvim`, and Berkeley Mono is installed separately.
+`~/.config/nvim`.
 
 ## Adding a host
 
@@ -56,3 +57,14 @@ Preserve these compatibility versions during subsequent upgrades.
 Stage new files with Git, run `just check` and `just lint`, then build on the target
 platform before activating. For service secrets, add the host's public key to
 `secrets.nix` and rekey with `agenix -r` using an authorized identity.
+
+## Private fonts
+
+Berkeley Mono is stored encrypted in `secrets/fonts/`. The shared desktop profile
+uses agenix to decrypt it at login into the user font directory on Linux and macOS;
+plaintext fonts stay outside the Nix store. Decryption requires a user SSH private
+key listed in `secrets.nix` (agenix checks `~/.ssh/id_ed25519` and `~/.ssh/id_rsa`).
+
+Add a machine's user public key to `fontRecipients`, then run `nix develop` and
+`agenix -r` from the repository root to re-encrypt the secrets. Host keys can be
+recipients too, but user font installation requires a key readable by that user.
