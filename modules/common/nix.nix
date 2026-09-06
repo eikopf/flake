@@ -1,10 +1,6 @@
 # common nix configuration
 
-{
-  user,
-  pkgs,
-  ...
-}:
+{ ... }:
 {
   # enable flakes and modern nix command
   nix.settings.experimental-features = [
@@ -24,13 +20,5 @@
   # set trusted users
   nix.settings.trusted-users = [
     "root"
-    user
-  ];
-
-  # nix utilities
-  # Tools configured via home-manager (home/) are intentionally not listed here;
-  # home-manager owns their installation alongside their configuration.
-  environment.systemPackages = with pkgs; [
-    devenv
   ];
 }

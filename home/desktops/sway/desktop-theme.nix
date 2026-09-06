@@ -1,10 +1,10 @@
-# Desktop theming and visual environment for wildspitz.
+# Desktop theming and visual environment for Sway.
 # Covers: cursor + GTK theme, swaybg wallpaper service, screenshots directory,
-# and the mako notification daemon.  Host-level policy (which programs are
-# enabled/disabled, gpg-agent config) stays in default.nix; this file is purely
-# about the look-and-feel of the desktop session.
+# and the mako notification daemon. Applications and agent integration are
+# selected by the workstation profile and system Sway module.
 {
   pkgs,
+  lib,
   ...
 }:
 {
@@ -37,7 +37,7 @@
       After = [ "graphical-session.target" ];
     };
     Service = {
-      ExecStart = "${pkgs.swaybg}/bin/swaybg -o DP-1 -i ${../../wallpaper/gris.jpg} -m fill";
+      ExecStart = lib.mkDefault "${pkgs.swaybg}/bin/swaybg -i ${../../../wallpaper/gris.jpg} -m fill";
       Restart = "on-failure";
     };
     Install.WantedBy = [ "graphical-session.target" ];

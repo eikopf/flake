@@ -4,10 +4,10 @@
   lib,
   ...
 }:
-lib.mkIf pkgs.stdenv.isLinux {
+{
   xdg = {
     enable = true;
-    userDirs = {
+    userDirs = lib.mkIf pkgs.stdenv.isLinux {
       enable = true;
       createDirectories = true;
       # export XDG_*_DIR variables into the session (set explicitly because

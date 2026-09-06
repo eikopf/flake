@@ -11,6 +11,7 @@
   ...
 }:
 {
+  imports = [ inputs.nix-homebrew.darwinModules.nix-homebrew ];
   nix-homebrew = {
     inherit user;
     enable = true;

@@ -27,7 +27,7 @@ let
   };
 in
 {
-  environment.systemPackages = [
+  home.packages = [
     thunderbird # wrapped to suppress the spurious ~/Thunderbird directory
   ];
 }

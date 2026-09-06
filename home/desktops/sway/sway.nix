@@ -26,12 +26,6 @@ in
         size = 10.0;
       };
 
-      output = {
-        "DP-1" = {
-          scale = "1.5";
-        };
-      };
-
       input = {
         "type:keyboard" = {
           xkb_options = "ctrl:nocaps";

@@ -1,8 +1,4 @@
-{ ... }:
+{ self, ... }:
 {
-  imports = [
-    ./base.nix
-    ./homebrew.nix
-    ./services.nix
-  ];
+  system.configurationRevision = self.rev or self.dirtyRev or null;
 }

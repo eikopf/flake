@@ -1,9 +1,5 @@
 { ... }:
 {
-  imports = [
-    ./audio.nix
-    ./base.nix
-    ./fonts.nix
-    ./locale.nix
-  ];
+  imports = [ ./locale.nix ];
+  zramSwap.enable = true;
 }

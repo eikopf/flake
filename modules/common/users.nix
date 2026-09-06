@@ -18,10 +18,9 @@ in
     shell = pkgs.fish;
   }
   // lib.optionalAttrs isLinux {
-    uid = identity.linuxUid;
+    uid = lib.mkDefault 1000;
     extraGroups = [
       "wheel"
-      "networkmanager"
     ];
     isNormalUser = true;
   };

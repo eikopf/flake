@@ -3,27 +3,25 @@
 
 {
   config,
+  user,
   ...
 }:
 {
   imports = [
     ./hardware-configuration.nix
+    ../../modules/nixos/uefi.nix
+    ../../profiles/nixos/workstation.nix
+    ../../modules/nixos/desktops/plasma.nix
   ];
 
   # networking
   networking.hostName = "rigi";
 
   # X11
-  services.xserver.enable = true;
   services.xserver.xkb.layout = "us";
   services.xserver.xkb.variant = "mac";
 
-  # Plasma 6
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-
   # graphics
-  hardware.graphics.enable = true;
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
     modesetting.enable = true;
@@ -33,8 +31,7 @@
     open = true;
   };
 
-  # install firefox
-  programs.firefox.enable = true;
+  home-manager.users.${user}.home.stateVersion = "26.05";
 
   # release at first install — do not change
   system.stateVersion = "24.11";
