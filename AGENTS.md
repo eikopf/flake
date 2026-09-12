@@ -1,7 +1,7 @@
 # Working in this repository
 
-Keep README.md a brief description of the current flake. Put development and
-maintenance instructions here, without recounting project history.
+Keep README.md a brief description of the current flake. Only agent-specific
+guidance belongs in AGENTS.md.
 
 ## Configuration changes
 
