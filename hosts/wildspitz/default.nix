@@ -14,7 +14,6 @@
     ../../profiles/nixos/homelab.nix
     ../../modules/nixos/desktops/sway.nix
     ../../modules/nixos/services/library.nix
-    ../../modules/nixos/services/memos.nix
     ../../modules/nixos/services/tailscale-exit-node.nix
   ];
   networking.hostName = "wildspitz";
@@ -34,10 +33,6 @@
     ingestPath = "${config.users.users.${user}.home}/documents/library-ingest";
     secretFile = ../../secrets/grimmory.env.age;
     openFirewall = true; # KOReader needs direct LAN access.
-    tailscaleServe = true;
-  };
-  personal.services.memos = {
-    enable = true;
     tailscaleServe = true;
   };
   # Compatibility baseline: preserve across upgrades and refactors.
