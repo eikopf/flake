@@ -3,11 +3,22 @@
   config,
   lib,
   inputs,
+  pkgs,
   ...
 }:
 let
   cfg = config.personal.services.library;
   absolutePath = lib.types.addCheck lib.types.str (s: lib.hasPrefix "/" s);
+  containerTailscale = "${config.virtualisation.podman.package}/bin/podman exec tailscale-library tailscale";
+  waitForTailscale = ''
+    for i in $(seq 1 30); do
+      if ${containerTailscale} status --json | ${pkgs.jq}/bin/jq -e '.BackendState == "Running"' >/dev/null 2>&1; then
+        exit 0
+      fi
+      sleep 1
+    done
+    exit 1
+  '';
 in
 {
   imports = [
@@ -48,6 +59,11 @@ in
     };
     openFirewall = lib.mkEnableOption "direct LAN access to Grimmory on TCP port 6060";
     tailscaleServe = lib.mkEnableOption "publishing Grimmory and Shelfmark as Tailscale Services";
+    tailscaleHostname = lib.mkOption {
+      type = lib.types.str;
+      default = "${config.networking.hostName}-homelab";
+      description = "Tailnet hostname of the separate tagged library container.";
+    };
   };
   config = lib.mkIf cfg.enable {
     assertions = [
@@ -60,9 +76,9 @@ in
         message = "The library service group must have an explicit GID for container ownership.";
       }
     ];
-    services.tailscale.enable = lib.mkIf cfg.tailscaleServe true;
     networking.firewall = {
       allowedTCPPorts = lib.optional cfg.openFirewall 6060;
+      allowedUDPPorts = lib.optional cfg.tailscaleServe 41642;
       interfaces.grimmory.allowedUDPPorts = [ 53 ];
     };
     age.secrets.grimmory-env = {
@@ -80,6 +96,31 @@ in
         };
       in
       {
+        # An independent, tagged node. Host networking lets Serve reach the
+        # existing loopback-bound backends; userspace mode does not create a
+        # second TUN interface or take over the desktop's routes/DNS.
+        containers.tailscale-library = lib.mkIf cfg.tailscaleServe {
+          containerConfig = {
+            image = "docker.io/tailscale/tailscale:v1.98.10@sha256:cdf5612ded5be1344f1a704b8c5e53496db97376bb533e5e15f141e48bf60cc0";
+            networks = [ "host" ];
+            environments = {
+              TS_STATE_DIR = "/var/lib/tailscale";
+              TS_AUTH_ONCE = "true";
+              TS_USERSPACE = "true";
+              TS_ACCEPT_DNS = "false";
+              TS_HOSTNAME = cfg.tailscaleHostname;
+              TS_EXTRA_ARGS = "--advertise-tags=tag:server";
+              TS_TAILSCALED_EXTRA_ARGS = "--port=41642";
+            };
+            volumes = [ "/var/lib/tailscale-library:/var/lib/tailscale" ];
+          };
+          unitConfig.Wants = [
+            "tailscale-serve-grimmory.service"
+            "tailscale-serve-shelfmark.service"
+          ];
+          serviceConfig.RestartSec = "10s";
+        };
+
         networks.grimmory.networkConfig = {
           interfaceName = "grimmory";
           # Adopt the network created by the old oci-containers helper on the
@@ -160,13 +201,15 @@ in
 
     # The containers chown these to the configured UID:GID at startup, but they
     # must exist before podman can bind-mount them.
-    systemd.tmpfiles.rules = [
-      "d ${cfg.grimmoryStatePath} 0750 root ${cfg.group} -"
-      "d ${cfg.grimmoryStatePath}/data 0750 ${cfg.owner} ${cfg.group} -"
-      "d ${cfg.grimmoryStatePath}/mariadb 0750 ${cfg.owner} ${cfg.group} -"
-      "d ${cfg.shelfmarkStatePath} 0750 ${cfg.owner} ${cfg.group} -"
-      "d ${cfg.ingestPath} 0755 ${cfg.owner} ${cfg.group} -"
-    ];
+    systemd.tmpfiles.rules =
+      lib.optional cfg.tailscaleServe "d /var/lib/tailscale-library 0700 root root -"
+      ++ [
+        "d ${cfg.grimmoryStatePath} 0750 root ${cfg.group} -"
+        "d ${cfg.grimmoryStatePath}/data 0750 ${cfg.owner} ${cfg.group} -"
+        "d ${cfg.grimmoryStatePath}/mariadb 0750 ${cfg.owner} ${cfg.group} -"
+        "d ${cfg.shelfmarkStatePath} 0750 ${cfg.owner} ${cfg.group} -"
+        "d ${cfg.ingestPath} 0755 ${cfg.owner} ${cfg.group} -"
+      ];
 
     # Serve Grimmory as a Tailscale Service: it gets its own DNS name
     # (https://grimmory.<tailnet>.ts.net) and virtual IP, leaving the host's
@@ -177,31 +220,41 @@ in
     # whose stop action clears the service config again.
     systemd.services.tailscale-serve-grimmory = lib.mkIf cfg.tailscaleServe {
       description = "Advertise Grimmory as Tailscale Service svc:grimmory";
-      after = [ "tailscaled.service" ];
-      requires = [ "tailscaled.service" ];
-      wantedBy = [ "multi-user.target" ];
-      # tailscaled's local API may not be ready right at boot; wait for it.
-      preStart = "until ${config.services.tailscale.package}/bin/tailscale status --peers=false >/dev/null 2>&1; do sleep 1; done";
+      after = [ "tailscale-library.service" ];
+      bindsTo = [ "tailscale-library.service" ];
+      partOf = [ "tailscale-library.service" ];
+      # On first boot the container still needs its one-time login.
+      preStart = waitForTailscale;
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --service=svc:grimmory --yes --https=443 127.0.0.1:6060";
+        Restart = "on-failure";
+        RestartSec = "10s";
+        TimeoutStartSec = "60s";
+        ExecStart = "${containerTailscale} serve --service=svc:grimmory --yes --https=443 127.0.0.1:6060";
         # Clears the whole service config, i.e. the port mapping above.
-        ExecStop = "${config.services.tailscale.package}/bin/tailscale serve clear svc:grimmory";
+        ExecStop = "${containerTailscale} serve clear svc:grimmory";
       };
     };
 
     systemd.services.tailscale-serve-shelfmark = lib.mkIf cfg.tailscaleServe {
       description = "Advertise Shelfmark as Tailscale Service svc:shelfmark";
-      after = [ "tailscaled.service" ];
-      requires = [ "tailscaled.service" ];
-      wantedBy = [ "multi-user.target" ];
-      preStart = "until ${config.services.tailscale.package}/bin/tailscale status --peers=false >/dev/null 2>&1; do sleep 1; done";
+      # Both commands update the same Serve config; serialize their writes.
+      after = [
+        "tailscale-library.service"
+        "tailscale-serve-grimmory.service"
+      ];
+      bindsTo = [ "tailscale-library.service" ];
+      partOf = [ "tailscale-library.service" ];
+      preStart = waitForTailscale;
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --service=svc:shelfmark --yes --https=443 127.0.0.1:8084";
-        ExecStop = "${config.services.tailscale.package}/bin/tailscale serve clear svc:shelfmark";
+        Restart = "on-failure";
+        RestartSec = "10s";
+        TimeoutStartSec = "60s";
+        ExecStart = "${containerTailscale} serve --service=svc:shelfmark --yes --https=443 127.0.0.1:8084";
+        ExecStop = "${containerTailscale} serve clear svc:shelfmark";
       };
     };
   };

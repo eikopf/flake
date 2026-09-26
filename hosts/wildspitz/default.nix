@@ -34,6 +34,7 @@
     secretFile = ../../secrets/grimmory.env.age;
     openFirewall = true; # KOReader needs direct LAN access.
     tailscaleServe = true;
+    tailscaleHostname = "wildspitzli";
   };
   # Compatibility baseline: preserve across upgrades and refactors.
   system.stateVersion = "25.11";
