@@ -20,7 +20,6 @@
       ../../home/profiles/development.nix
     ];
     home.packages = with pkgs; [
-      docker
       orbstack
       monitorcontrol
       hledger
