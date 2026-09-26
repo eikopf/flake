@@ -49,11 +49,8 @@
     global.autoUpdate = false;
 
     casks = [
-      # coding agents
-      "claude-code"
       "codex"
-
-      "ghostty" # terminal
+      "ghostty"
     ];
   };
 
