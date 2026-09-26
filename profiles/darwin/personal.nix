@@ -49,7 +49,6 @@
     global.autoUpdate = false;
 
     casks = [
-      "codex"
       "ghostty"
     ];
   };
