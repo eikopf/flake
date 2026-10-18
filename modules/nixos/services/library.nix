@@ -138,7 +138,7 @@ in
             After = [ containers.grimmory-mariadb.ref ];
           };
           containerConfig = {
-            image = "ghcr.io/grimmory-tools/grimmory:v3.2.4@sha256:dfa7afdfcf25d649fd664497a62385dd00cd9678c37546e182c172e41c8e80cb";
+            image = "ghcr.io/grimmory-tools/grimmory:v3.5.0@sha256:bf6fe21c6e247597f7869664a440b5a34242e2d2940575cae39c17bfaa66dc0b";
             environments = commonEnvironment // {
               USER_ID = userUid;
               GROUP_ID = usersGid;
