@@ -8,7 +8,6 @@ let
     self
     nixpkgs
     darwin
-    home-manager
     ;
   inherit (nixpkgs) lib;
   forAllSystems = lib.genAttrs (lib.unique (map (host: host.system) (lib.attrValues hosts)));
@@ -17,7 +16,9 @@ let
     name: host:
     let
       isDarwin = host.platform == "darwin";
-      constructor = if isDarwin then darwin.lib.darwinSystem else lib.nixosSystem;
+      hostNixpkgs = inputs.${host.nixpkgsInput or "nixpkgs"};
+      hostHomeManager = inputs.${host.homeManagerInput or "home-manager"};
+      constructor = if isDarwin then darwin.lib.darwinSystem else hostNixpkgs.lib.nixosSystem;
     in
     constructor {
       system = host.system;
@@ -30,7 +31,10 @@ let
         ../modules/common
         (if isDarwin then ../modules/darwin else ../modules/nixos)
         (
-          if isDarwin then home-manager.darwinModules.home-manager else home-manager.nixosModules.home-manager
+          if isDarwin then
+            hostHomeManager.darwinModules.home-manager
+          else
+            hostHomeManager.nixosModules.home-manager
         )
       ];
     };

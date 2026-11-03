@@ -1,2 +1,4 @@
 /fonts/
 .direnv/
+/result
+/result-*

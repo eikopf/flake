@@ -4,6 +4,7 @@ Personal NixOS and macOS configurations. This flake manages the following machin
 |---|---|---|---|
 | Pilatus | macOS | aarch64 | Personal laptop |
 | Wildspitz | NixOS | x86_64 | Personal workstation (hosts some Tailscale services) |
+| Gottschalkenberg | NixOS | aarch64 | Raspberry Pi 5; experimental HAOS VM ([setup](hosts/gottschalkenberg/README.md)) |
 
 ## Structure
 
