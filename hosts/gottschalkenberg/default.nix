@@ -1,4 +1,4 @@
-{ user, ... }:
+{ user, pkgs, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -9,6 +9,7 @@
   ];
 
   networking.hostName = "gottschalkenberg";
+  environment.systemPackages = [ pkgs.ghostty.terminfo ];
   users.users.${user}.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPFCbOpE20NLZKhFKY7qZWtVYQOARKs5v9nvP/ki98UI oliver@wildspitz"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH9GqsSCwwBL0Upl+geKDKH3OoqFFduiwI4cYHA/DV/z oliver+bitwarden@wooding.dev"
