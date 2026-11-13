@@ -5,10 +5,33 @@
     enable = true;
 
     settings = {
-      # normalisation — disable flatten to get BSP-style 1/2 + 1/4 + 1/4 layout
-      enable-normalization-flatten-containers = false;
+      config-version = 2;
 
-      # layout
+      # callbacks
+      after-startup-command = [ ];
+      on-focused-monitor-changed = [ "move-mouse monitor-lazy-center" ];
+      on-mode-changed = [ ];
+
+      enable-normalization-flatten-containers = true;
+      enable-normalization-opposite-orientation-for-nested-containers = true;
+
+      default-root-container-layout = "tiles";
+      default-root-container-orientation = "auto";
+
+      persistent-workspaces = [
+        "1"
+        "2"
+        "3"
+        "4"
+        "5"
+        "6"
+        "7"
+        "8"
+        "9"
+      ];
+
+      key-mapping.preset = "qwerty";
+
       gaps = {
         outer.top = 8;
         outer.bottom = 8;
@@ -19,7 +42,6 @@
         inner.vertical = 8;
       };
 
-      # primary keybindings
       mode.main.binding = {
         alt-slash = "layout tiles horizontal vertical";
         alt-comma = "layout accordion horizontal vertical";
@@ -34,6 +56,26 @@
         alt-shift-k = "move up";
         alt-shift-l = "move right";
 
+        alt-1 = "workspace 1";
+        alt-2 = "workspace 2";
+        alt-3 = "workspace 3";
+        alt-4 = "workspace 4";
+        alt-5 = "workspace 5";
+        alt-6 = "workspace 6";
+        alt-7 = "workspace 7";
+        alt-8 = "workspace 8";
+        alt-9 = "workspace 9";
+
+        alt-shift-1 = "move-node-to-workspace 1";
+        alt-shift-2 = "move-node-to-workspace 2";
+        alt-shift-3 = "move-node-to-workspace 3";
+        alt-shift-4 = "move-node-to-workspace 4";
+        alt-shift-5 = "move-node-to-workspace 5";
+        alt-shift-6 = "move-node-to-workspace 6";
+        alt-shift-7 = "move-node-to-workspace 7";
+        alt-shift-8 = "move-node-to-workspace 8";
+        alt-shift-9 = "move-node-to-workspace 9";
+
         ctrl-alt-shift-h = "move-node-to-monitor --focus-follows-window left";
         ctrl-alt-shift-l = "move-node-to-monitor --focus-follows-window right";
 
@@ -41,13 +83,13 @@
         ctrl-equal = "resize smart +50";
 
         alt-shift-semicolon = "mode service";
+        alt-enter = "exec-and-forget osascript -e 'tell application \"Ghostty.app\" to new tab in front window'";
       };
 
-      # service mode keybindings
       mode.service.binding = lib.mapAttrs (_: v: [ v ] ++ [ "mode main" ]) {
         esc = "reload-config";
         r = "flatten-workspace-tree"; # reset layout
-        f = "layout floating tiling"; # toggle between floating and tiling layout
+        f = "layout floating tiling"; # toggle floating/tiling layout
         backspace = "close-all-windows-but-current";
       };
     };
